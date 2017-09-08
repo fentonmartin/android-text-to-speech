@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setLog("onCreate");
 
         /* Add views declaration */
         textToSpeech = (Button) findViewById(R.id.text_to_speech_btn);
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         speech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
+                setLog("onInit TTS");
                 /* Check Text to Speech */
                 if (i != TextToSpeech.ERROR) {
                     /* Set Text to Speech Language */
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     /* Set Toast Ready */
                     Toast.makeText(MainActivity.this, "Text to Speech is ready :)",
                             Toast.LENGTH_SHORT).show();
+                    setLog("Success TTS");
 
                     /* Set OnUtterance Progress Listener */
                     speech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                             /* Set Speech Started */
                             Toast.makeText(MainActivity.this, "Speech Started",
                                     Toast.LENGTH_SHORT).show();
+                            setLog("Listener TTS onStart: " + s);
                         }
 
                         @Override
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                             /* Set Speech Done */
                             Toast.makeText(MainActivity.this, "Speech Done",
                                     Toast.LENGTH_SHORT).show();
+                            setLog("Listener TTS onDone: " + s);
                         }
 
                         @Override
@@ -71,12 +76,14 @@ public class MainActivity extends AppCompatActivity {
                             /* Set Speech Error */
                             Toast.makeText(MainActivity.this, "Speech Error",
                                     Toast.LENGTH_SHORT).show();
+                            setLog("Listener TTS onError: " + s);
                         }
                     });
                 } else {
                     /* Set Toast Error */
                     Toast.makeText(MainActivity.this, "Something is wrong :(",
                             Toast.LENGTH_SHORT).show();
+                    setLog("Phone not supported");
                 }
             }
         });
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         textToSpeech.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setLog("onClick: textToSpeech");
                 /* Get Text from Text Input */
                 String text = textInput.getText().toString();
                 textResult.setText(text);
@@ -92,9 +100,11 @@ public class MainActivity extends AppCompatActivity {
                 /* Speak Text with Text to Speech */
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     speech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+                    setLog("textToSpeech: Speak Lollipop");
                 } else {
                     // noinspection deprecation
                     speech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    setLog("textToSpeech: Speak (Deprecated)");
                 }
             }
         });
@@ -103,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         speechToText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setLog("onClick: speechToText");
                 /* Start Speech Recognition */
                 speechRecognition();
             }
@@ -111,10 +122,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPause() {
+        setLog("onPause");
         /* Shutdown Text to Speech */
         if (speech != null) {
             speech.stop();
             speech.shutdown();
+            setLog("Speech Shutdown");
         }
         super.onPause();
     }
@@ -122,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        setLog("onActivityResult");
 
         /* Add Recognizer Result */
         switch (requestCode) {
@@ -132,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
                     /* Set Recognizer Result */
                     textResult.setText(result.get(0));
+                    setLog("onActivityResult: Speech Success");
                 }
                 break;
             }
@@ -140,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
     /* Add Speech Recognition */
     public void speechRecognition() {
+        setLog("speechRecognition Initiated");
         /* Add Recognizer Intent */
         Intent intent = new Intent(RecognizerIntent
                 .ACTION_RECOGNIZE_SPEECH);
@@ -154,10 +170,16 @@ public class MainActivity extends AppCompatActivity {
         try {
             /* Start Activity For Result */
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+            setLog("speechRecognition: StartActivityForResult");
         } catch (ActivityNotFoundException a) {
             /* Set Phone Not Supported Recognizer */
             Toast.makeText(getApplicationContext(), getString(R.string.speech_not_supported),
                     Toast.LENGTH_SHORT).show();
+            setLog("speechRecognition: ActivityNotFoundException");
         }
+    }
+
+    private void setLog(String log) {
+        Log.d(getClass().getSimpleName(), log);
     }
 }
