@@ -3,4 +3,8 @@
     <string name="text_menu">Please choose the menu:</string>
     <string name="btn_text_to_speech">Text to Speech</string>
     <string name="btn_speech_to_text">Speech to Text</string>
+
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="speech_prompt">Say something!</string>
+    <string name="speech_tap_mic">Tap on mic to speak</string>
 </resources>
