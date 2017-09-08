@@ -39,6 +39,82 @@ public class MainActivity extends AppCompatActivity {
         textResult = (TextView) findViewById(R.id.text_result);
 
         /* Init Text to Speech */
+        speechInit();
+
+        /* Init Button Text to Speech */
+        textToSpeech.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setLog("onClick: textToSpeech");
+                /* Get Text from Text Input */
+                String text = textInput.getText().toString();
+                textResult.setText(text);
+
+                /* Speak Text with Text to Speech */
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    speech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+                    setLog("textToSpeech: Speak Lollipop");
+                } else {
+                    // noinspection deprecation
+                    speech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    setLog("textToSpeech: Speak (Deprecated)");
+                }
+            }
+        });
+
+        /* Init Button Speech to Text */
+        speechToText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setLog("onClick: speechToText");
+                /* Start Speech Recognition */
+                speechRecognition();
+            }
+        });
+    }
+
+    public void onPause() {
+        setLog("onPause");
+        /* Shutdown Text to Speech */
+        if (speech != null) {
+            speech.stop();
+            speech.shutdown();
+            setLog("Speech Shutdown");
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /* Init Text to Speech */
+        speechInit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        setLog("onActivityResult");
+
+        /* Add Recognizer Result */
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+                    /* Get Recognizer Result */
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                    /* Set Recognizer Result */
+                    textResult.setText(result.get(0));
+                    setLog("onActivityResult: Speech Success");
+                }
+                break;
+            }
+        }
+    }
+
+    private void speechInit() {
+        /* Init Text to Speech */
         speech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -87,70 +163,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        /* Init Button Text to Speech */
-        textToSpeech.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setLog("onClick: textToSpeech");
-                /* Get Text from Text Input */
-                String text = textInput.getText().toString();
-                textResult.setText(text);
-
-                /* Speak Text with Text to Speech */
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    speech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
-                    setLog("textToSpeech: Speak Lollipop");
-                } else {
-                    // noinspection deprecation
-                    speech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                    setLog("textToSpeech: Speak (Deprecated)");
-                }
-            }
-        });
-
-        /* Init Button Speech to Text */
-        speechToText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setLog("onClick: speechToText");
-                /* Start Speech Recognition */
-                speechRecognition();
-            }
-        });
-
-    }
-
-    public void onPause() {
-        setLog("onPause");
-        /* Shutdown Text to Speech */
-        if (speech != null) {
-            speech.stop();
-            speech.shutdown();
-            setLog("Speech Shutdown");
-        }
-        super.onPause();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        setLog("onActivityResult");
-
-        /* Add Recognizer Result */
-        switch (requestCode) {
-            case REQ_CODE_SPEECH_INPUT: {
-                if (resultCode == RESULT_OK && null != data) {
-                    /* Get Recognizer Result */
-                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-
-                    /* Set Recognizer Result */
-                    textResult.setText(result.get(0));
-                    setLog("onActivityResult: Speech Success");
-                }
-                break;
-            }
-        }
     }
 
     /* Add Speech Recognition */
