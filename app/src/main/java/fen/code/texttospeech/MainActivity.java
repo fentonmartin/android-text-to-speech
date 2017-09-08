@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
                     /* Set Recognizer Result */
+                    textInput.setText(result.get(0));
                     textResult.setText(result.get(0));
                     setLog("onActivityResult: Speech Success");
                 }
