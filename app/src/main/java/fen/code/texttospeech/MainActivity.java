@@ -6,7 +6,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,6 +49,30 @@ public class MainActivity extends AppCompatActivity {
                     /* Set Toast Ready */
                     Toast.makeText(MainActivity.this, "Text to Speech is ready :)",
                             Toast.LENGTH_SHORT).show();
+
+                    /* Set OnUtterance Progress Listener */
+                    speech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        @Override
+                        public void onStart(String s) {
+                            /* Set Speech Started */
+                            Toast.makeText(MainActivity.this, "Speech Started",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onDone(String s) {
+                            /* Set Speech Done */
+                            Toast.makeText(MainActivity.this, "Speech Done",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(String s) {
+                            /* Set Speech Error */
+                            Toast.makeText(MainActivity.this, "Speech Error",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     /* Set Toast Error */
                     Toast.makeText(MainActivity.this, "Something is wrong :(",
